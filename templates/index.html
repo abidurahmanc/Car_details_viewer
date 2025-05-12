@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Details</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            margin: auto;
+        }
+        h2 {
+            color: #333;
+        }
+        select, button {
+            margin-top: 10px;
+            padding: 10px;
+            font-size: 16px;
+            width: 100%;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 15px;
+            text-align: left;
+        }
+        .details {
+            background: #eee;
+            padding: 10px;
+            border-radius: 5px;
+            width: 48%;
+        }
+        .details p {
+            margin: 5px 0;
+            font-size: 16px;
+        }
+        .image-container {
+            width: 48%;
+            text-align: center;
+        }
+        img {
+            border-radius: 5px;
+            width: 100%;
+            height: auto;
+            max-height: 400px;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Select a Car</h2>
+        <select id="car-select">
+            {% for car in car_names %}
+            <option value="{{ car }}">{{ car }}</option>
+            {% endfor %}
+        </select>
+        <button onclick="fetchCarDetails()">Get Details</button>
+        
+        <div class="content">
+            <div id="car-details" class="details">Select a car to see details here...</div>
+            <div class="image-container">
+                <img id="car-image" src="" alt="Car Image">
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        $(document).ready(function() {
+            $('#car-select').select2({ placeholder: "Search for a car", allowClear: true });
+        });
+
+        function fetchCarDetails() {
+            var carName = $("#car-select").val();
+            $.post("/get_car_details", { car_name: carName }, function(data) {
+                if (data.error) {
+                    $("#car-details").html("<p>" + data.error + "</p>");
+                    $("#car-image").attr("src", data.image_url);
+                } else {
+                    var detailsHtml = "";
+                    for (var key in data.car_details) {
+                        detailsHtml += `<p><strong>${key}:</strong> ${data.car_details[key]}</p>`;
+                    }
+                    $("#car-details").html(detailsHtml);
+                    $("#car-image").attr("src", data.image_url).css("max-height", "400px");
+                }
+            });
+        }
+    </script>
+</body>
+</html>
