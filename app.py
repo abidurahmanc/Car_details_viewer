@@ -1,5 +1,4 @@
 from flask import Flask, request, jsonify, render_template
-import pickle
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
